@@ -117,10 +117,6 @@ trait PuthTestCaseTrait
             $this->page->setViewport($this->defaultViewport);
         }
 
-        if (!empty($this->baseUrl)) {
-            $this->page->goto($this->baseUrl);
-        }
-
         // Set prefers-reduced-motion to reduce because click has problems to wait for scroll
         // animation if 'scroll-behavior: smooth' is set.
         // TODO set by default inside Puth server
