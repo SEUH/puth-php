@@ -139,7 +139,9 @@ trait PuthTestCaseTrait
      */
     public static function prepare()
     {
-        static::startPuthProcess();
+        if (method_exists(__CLASS__, 'shouldCreatePuthProcess') && static::shouldCreatePuthProcess()) {
+            static::startPuthProcess();
+        }
     }
 
     /**
