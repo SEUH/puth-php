@@ -124,6 +124,11 @@ trait PuthTestCaseTrait
             'name' => 'prefers-reduced-motion',
             'value' => 'reduce',
         ]]);
+        
+        // Set default cookies if defined
+        if (property_exists($this, 'cookies')) {
+            $this->page->setCookie(...$this->cookies);
+        }
     }
 
     /**
