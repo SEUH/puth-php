@@ -45,7 +45,7 @@ trait PuthTestCaseTrait
      *
      * @var bool
      */
-    public bool $snapshot = false;
+    public bool $snapshot = true;
 
     /**
      * Override headless browser setting.
@@ -88,7 +88,9 @@ trait PuthTestCaseTrait
 
         $this->context = new Context($this->getPuthInstanceUrl(), [
             'snapshot' => $this->shouldSnapshot(),
-            'test' => $this->getName(),
+            'test' => [
+                'name' => $this->getName(),
+            ],
             'group' => get_class($this),
             'dev' => $this->isDev(),
             'debug' => $this->isDebug(),
@@ -124,7 +126,7 @@ trait PuthTestCaseTrait
             'name' => 'prefers-reduced-motion',
             'value' => 'reduce',
         ]]);
-        
+
         // Set default cookies if defined
         if (property_exists($this, 'cookies')) {
             $this->page->setCookie(...$this->cookies);
@@ -156,7 +158,17 @@ trait PuthTestCaseTrait
             $this->page->close();
         }
 
-        $this->context->destroy();
+        $destroyOptions = [];
+
+        if ($this->hasFailed()) {
+            $this->context->testFailed();
+
+            if ($this->saveSnapshotOnFailure) {
+                $destroyOptions['save'] = ['to' => 'file'];
+            }
+        }
+
+        $this->context->destroy($destroyOptions);
     }
 
     protected function testDownClass()
