@@ -59,7 +59,7 @@ trait PuthTestCaseTrait
      *
      * @var string
      */
-    protected string $baseUrl;
+    // protected string $baseUrl;
 
     /**
      * Set to connect to custom browser ws endpoint instead of the puth server creating a new one.
@@ -130,6 +130,10 @@ trait PuthTestCaseTrait
         // Set default cookies if defined
         if (property_exists($this, 'cookies')) {
             $this->page->setCookie(...$this->cookies);
+        }
+
+        if ($baseUrl = $this->getBaseUrl()) {
+            $this->page->goto($baseUrl);
         }
     }
 
@@ -204,6 +208,13 @@ trait PuthTestCaseTrait
     public function getPuthInstanceUrl(): string
     {
         return 'http://localhost:' . static::$puthPort;
+    }
+
+    public function getBaseUrl(): string
+    {
+        if (property_exists($this, 'baseUrl')) {
+            return $this->baseUrl;
+        }
     }
 
     protected function isDev(): bool
