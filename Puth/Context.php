@@ -31,7 +31,7 @@ class Context
         $this->client =  new Client([
             'base_uri' => $this->baseUrl,
         ]);
-        
+
         $this->instantiate();
     }
 
@@ -41,14 +41,17 @@ class Context
 
         $this->id = $response->id;
         $this->type = $response->type;
-        
+
         $this->log("Created");
     }
 
-    public function destroy()
+    public function destroy($options)
     {
         $response = $this->client->delete('context', [
-            'json' => $this->getRepresentation(),
+            'json' => array_merge(
+                $options,
+                $this->getRepresentation()
+            ),
         ]);
         $statusCode = $response->getStatusCode();
 
@@ -65,14 +68,14 @@ class Context
             return false;
         }
     }
-    
+
     public function getRepresentation() {
         return [
             'id' => $this->getId(),
             'type' => $this->getType(),
         ];
     }
-    
+
     public function isDebug() {
         return $this->options['debug'] === true;
     }
@@ -80,7 +83,7 @@ class Context
     public function isDev() {
         return $this->options['dev'] === true;
     }
-    
+
     public function getContext() {
         return $this;
     }
