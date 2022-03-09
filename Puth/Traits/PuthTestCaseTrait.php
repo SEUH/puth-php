@@ -210,11 +210,13 @@ trait PuthTestCaseTrait
         return 'http://localhost:' . static::$puthPort;
     }
 
-    public function getBaseUrl(): string
+    public function getBaseUrl(): ?string
     {
         if (property_exists($this, 'baseUrl')) {
             return $this->baseUrl;
         }
+
+        return null;
     }
 
     protected function isDev(): bool
