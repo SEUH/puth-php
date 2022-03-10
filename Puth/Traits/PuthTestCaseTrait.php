@@ -172,7 +172,7 @@ trait PuthTestCaseTrait
             }
         }
 
-        $this->context->destroy($destroyOptions);
+        $this->context->destroy(['options' => $destroyOptions]);
     }
 
     protected function testDownClass()
