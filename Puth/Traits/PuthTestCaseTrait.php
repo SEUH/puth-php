@@ -146,7 +146,7 @@ trait PuthTestCaseTrait
      */
     public static function prepare()
     {
-        if (method_exists(__CLASS__, 'shouldCreatePuthProcess') && static::shouldCreatePuthProcess()) {
+        if (!method_exists(__CLASS__, 'shouldCreatePuthProcess') || static::shouldCreatePuthProcess()) {
             static::startPuthProcess();
         }
     }
