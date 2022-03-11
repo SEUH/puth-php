@@ -94,6 +94,9 @@ trait PuthTestCaseTrait
             'group' => get_class($this),
             'dev' => $this->isDev(),
             'debug' => $this->isDebug(),
+            'timeouts' => [
+                'command' => $this->getTimeout(),
+            ],
         ]);
 
         // If specific browser ws endpoint is set, always connect to that
@@ -222,6 +225,11 @@ trait PuthTestCaseTrait
     protected function isDev(): bool
     {
         return isset($this->dev) ? $this->dev : false;
+    }
+
+    protected function getTimeout(): bool
+    {
+        return $this->timeout ?? 10 * 1000;
     }
 
     protected function isDebug(): bool
