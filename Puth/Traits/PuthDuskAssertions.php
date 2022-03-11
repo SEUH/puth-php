@@ -7,7 +7,8 @@ use Puth\GenericObject;
 
 trait PuthDuskAssertions
 {
-    
+    use PuthAssertions;
+
     /**
      * Assert that the page title is the given value.
      *
@@ -175,7 +176,8 @@ trait PuthDuskAssertions
         $result = [];
         
         try {
-            $result = $element->contains($text);
+            // TODO implement retry safe "notContains" function or maybe provide ['negate' => true]?
+            $result = $element->contains($text, ['timeout' => -1]);
         } catch (\Exception $exception) {
         };
         
@@ -381,6 +383,7 @@ trait PuthDuskAssertions
                 return null;
             }
         }
+
         return $element;
     }
     
@@ -476,16 +479,20 @@ trait PuthDuskAssertions
      * Assert that the given array of values are available to be selected.
      *
      * @param string|GenericObject $element
-     * @param array $values
+     * @param mixed $values
      * @return $this
      */
-    public function assertSelectHasOptions($element, array $values)
+    public function assertSelectHasOptions($element, $values)
     {
+        if (!is_array($values)) {
+            $values = [$values];
+        }
+
         $element = $this->resolveElement($element);
         $options = array_map(function ($option) {
             return $option->value();
         }, $element->getAll('option'));
-        
+
         foreach ($values as $value) {
             Assert::assertTrue(
                 in_array($value, $options),
@@ -500,11 +507,15 @@ trait PuthDuskAssertions
      * Assert that the given array of values are not available to be selected.
      *
      * @param string $field
-     * @param array $values
+     * @param mixed $values
      * @return $this
      */
-    public function assertSelectMissingOptions($field, array $values)
+    public function assertSelectMissingOptions($field, $values)
     {
+        if (!is_array($values)) {
+            $values = [$values];
+        }
+
         Assert::assertCount(
             0, $this->resolver->resolveSelectOptions($field, $values),
             'Unexpected options [' . implode(',', $values) . "] for selection field [{$field}]."
@@ -588,7 +599,7 @@ trait PuthDuskAssertions
         $element = $this->resolveElement($element);
         
         $actual = $element->getProperty($attribute)->jsonValue();
-        
+
         Assert::assertNotNull(
             $actual,
             "Did not see expected attribute [{$attribute}] within element [{$element}]."
@@ -596,7 +607,7 @@ trait PuthDuskAssertions
         
         Assert::assertEquals(
             $value, $actual,
-            "Expected '$attribute' attribute [{$value}] does not equal actual value [$actual]."
+            "Expected '$attribute' attribute [{$actual}] does not equal expected value [$value]."
         );
         
         return $this;
@@ -670,17 +681,17 @@ trait PuthDuskAssertions
      * @param string $message
      * @return $this
      */
-    public function assertDialogOpened($message)
-    {
-        $actualMessage = $this->driver->switchTo()->alert()->getText();
-        
-        Assert::assertEquals(
-            $message, $actualMessage,
-            "Expected dialog message [{$message}] does not equal actual message [{$actualMessage}]."
-        );
-        
-        return $this;
-    }
+    // public function assertDialogOpened($message)
+    // {
+    //     $actualMessage = $this->driver->switchTo()->alert()->getText();
+    //
+    //     Assert::assertEquals(
+    //         $message, $actualMessage,
+    //         "Expected dialog message [{$message}] does not equal actual message [{$actualMessage}]."
+    //     );
+    //
+    //     return $this;
+    // }
     
     /**
      * Assert that the given field is enabled.
@@ -742,36 +753,30 @@ trait PuthDuskAssertions
     
     /**
      * Assert that the given field is focused.
-     * @todo implement
+     *
      * @param string|GenericObject $element
      * @return $this
      */
     public function assertFocused($element)
     {
         $element = $this->resolveElement($element);
-        
-        Assert::assertTrue(
-            $this->driver->switchTo()->activeElement()->equals($element),
-            "Expected element [{$field}] to be focused, but it wasn't."
-        );
-        
+
+        $this->assertElementEquals($this->page->focused(), $element);
+
         return $this;
     }
     
     /**
      * Assert that the given field is not focused.
-     * @todo implement
-     * @param string $field
+     *
+     * @param string $element
      * @return $this
      */
-    public function assertNotFocused($field)
+    public function assertNotFocused($element)
     {
-        $element = $this->resolver->resolveForField($field);
-        
-        Assert::assertFalse(
-            $this->driver->switchTo()->activeElement()->equals($element),
-            "Expected element [{$field}] not to be focused, but it was."
-        );
+        $element = $this->resolveElement($element);
+
+        $this->assertElementNotEquals($this->page->focused(), $element);
         
         return $this;
     }

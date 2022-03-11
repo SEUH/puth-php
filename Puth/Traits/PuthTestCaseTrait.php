@@ -94,6 +94,9 @@ trait PuthTestCaseTrait
             'group' => get_class($this),
             'dev' => $this->isDev(),
             'debug' => $this->isDebug(),
+            'timeouts' => [
+                'command' => $this->getTimeout(),
+            ],
         ]);
 
         // If specific browser ws endpoint is set, always connect to that
@@ -146,7 +149,7 @@ trait PuthTestCaseTrait
      */
     public static function prepare()
     {
-        if (method_exists(__CLASS__, 'shouldCreatePuthProcess') && static::shouldCreatePuthProcess()) {
+        if (!method_exists(__CLASS__, 'shouldCreatePuthProcess') || static::shouldCreatePuthProcess()) {
             static::startPuthProcess();
         }
     }
@@ -207,7 +210,7 @@ trait PuthTestCaseTrait
 
     public function getPuthInstanceUrl(): string
     {
-        return 'http://localhost:' . static::$puthPort;
+        return 'http://localhost:' . static::getPuthPort();
     }
 
     public function getBaseUrl(): ?string
@@ -222,6 +225,11 @@ trait PuthTestCaseTrait
     protected function isDev(): bool
     {
         return isset($this->dev) ? $this->dev : false;
+    }
+
+    protected function getTimeout(): bool
+    {
+        return $this->timeout ?? 10 * 1000;
     }
 
     protected function isDebug(): bool

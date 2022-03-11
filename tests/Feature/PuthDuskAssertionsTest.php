@@ -8,41 +8,41 @@ class PuthDuskAssertionsTest extends PuthTestCase
 {
     use PuthDuskAssertions;
     
-    protected string $baseUrl = 'https://example.cypress.io/';
+    protected string $baseUrl = 'https://playground.puth.dev//';
     
     public function testAssertTitle()
     {
-        $this->assertTitle('Cypress.io: Kitchen Sink');
+        $this->assertTitle('Puth - Playground');
     }
     
     public function testAssertTitleContains()
     {
-        $this->assertTitleContains('Kitchen Sink');
+        $this->assertTitleContains('Playground');
     }
     
     public function testAssertSee()
     {
-        $this->assertSee('Commands');
+        $this->assertSee('Welcome to Puths Playground');
     }
     
     public function testAssertDontSee()
     {
-        $this->assertDontSee('Commandss');
+        $this->assertDontSee('This text does not exists');
     }
     
     public function testAssertSeeIn()
     {
-        $this->assertSeeIn('#utilities', 'Commands');
+        $this->assertSeeIn('body', 'Querying');
     }
     
     public function testAssertDontSeeIn()
     {
-        $this->assertDontSeeIn('.banner', 'Commands');
+        $this->assertDontSeeIn('body', 'This text does not exists');
     }
     
     public function testAssertSourceHas()
     {
-        $this->assertSourceHas('<title>Cypress.io: Kitchen Sink</title>');
+        $this->assertSourceHas('<title>Puth - Playground</title>');
     }
     
     public function testAssertSourceMissing()
@@ -52,7 +52,7 @@ class PuthDuskAssertionsTest extends PuthTestCase
     
     public function testAssertSeeLink()
     {
-        $this->assertSeeLink('https://www.cypress.io');
+        $this->assertSeeLink('https://puth.dev');
     }
     
     public function testAssertDontSeeLink()
@@ -72,95 +72,85 @@ class PuthDuskAssertionsTest extends PuthTestCase
     
     public function testAssertInputValue()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $input = $this->page->get('input');
-        $input->type('puth test type');
-        
-        $this->assertInputValue($input, 'puth test type');
+        $input = $this->page->get('#properties-value input');
+
+        $this->assertInputValue($input, 'input with value');
     }
     
     public function testAssertInputValueIsNot()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
+        $input = $this->page->get('#properties-value input');
         
-        $input = $this->page->get('input');
-        $input->type('puth test type');
-        
-        $this->assertInputValueIsNot($input, 'not the typed value');
+        $this->assertInputValueIsNot($input, 'not the correct value');
     }
-    
-    public function testAssertChecked()
-    {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $checkbox = $this->page->get('input[type="checkbox"]');
-        $checkbox->click();
-        
-        $this->assertChecked($checkbox);
-    }
-    
-    public function testAssertNotChecked()
-    {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $checkbox = $this->page->get('input[type="checkbox"]');
-        
-        $this->assertNotChecked($checkbox);
-    }
-    
-    public function testAssertRadioSelected()
-    {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $radio = $this->page->get('input[type="radio"]');
-        $radio->click();
-        
-        $this->assertRadioSelected($radio);
-    }
-    
-    public function testAssertRadioNotSelected()
-    {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $radio = $this->page->get('input[type="radio"]');
-        
-        $this->assertRadioNotSelected($radio);
-    }
+
+    // TODO add checkbox to playground
+    // public function testAssertChecked()
+    // {
+    //     $this->page->goto('https://example.cypress.io/commands/actions');
+    //
+    //     $checkbox = $this->page->get('input[type="checkbox"]');
+    //     $checkbox->click();
+    //
+    //     $this->assertChecked($checkbox);
+    // }
+
+    // TODO add checkbox to playground
+    // public function testAssertNotChecked()
+    // {
+    //     $this->page->goto('https://example.cypress.io/commands/actions');
+    //
+    //     $checkbox = $this->page->get('input[type="checkbox"]');
+    //
+    //     $this->assertNotChecked($checkbox);
+    // }
+
+    // TODO add radio to playground
+    // public function testAssertRadioSelected()
+    // {
+    //     $this->page->goto('https://example.cypress.io/commands/actions');
+    //
+    //     $radio = $this->page->get('input[type="radio"]');
+    //     $radio->click();
+    //
+    //     $this->assertRadioSelected($radio);
+    // }
+
+    // TODO add radio to playground
+    // public function testAssertRadioNotSelected()
+    // {
+    //     $this->page->goto('https://example.cypress.io/commands/actions');
+    //
+    //     $radio = $this->page->get('input[type="radio"]');
+    //
+    //     $this->assertRadioNotSelected($radio);
+    // }
     
     public function testAssertSelected()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
+        $select = $this->page->get('#actions-select');
+        $select->select('apple');
         
-        $select = $this->page->get('select');
-        $select->select('fr-apples');
-        
-        $this->assertSelected($select, 'fr-apples');
+        $this->assertSelected($select, 'apple');
     }
     
     public function testAssertNotSelected()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $select = $this->page->get('select');
-        $select->select('fr-apples');
-        
-        $this->assertNotSelected($select, 'fr-oranges');
+        $select = $this->page->get('#actions-select');
+        $select->select('apple');
+
+        $this->assertNotSelected($select, 'orange');
     }
     
     public function testAssertSelectHasOptions()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $select = $this->page->get('select');
+        $select = $this->page->get('#actions-select');
         
         $this->assertSelectHasOptions(
             $select,
             [
-                '--Select a fruit--',
-                'fr-apples',
-                'fr-oranges',
-                'fr-bananas',
+                'apple',
+                'orange',
             ]
         );
     }
@@ -173,11 +163,9 @@ class PuthDuskAssertionsTest extends PuthTestCase
     
     public function testAssertSelectHasOption()
     {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
         $this->assertSelectHasOptions(
-            $this->page->get('select'),
-            ['fr-bananas']
+            $this->page->get('#actions-select'),
+            'orange'
         );
     }
     
@@ -187,22 +175,12 @@ class PuthDuskAssertionsTest extends PuthTestCase
         // TODO assertSelectMissingOption
     }
     
-    public function testAssertValue()
-    {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $input = $this->page->get('input');
-        $input->type('puth test type');
-        
-        $this->assertValue($input, 'puth test type');
-    }
-    
     public function testAssertAttribute()
     {
         $this->assertAttribute(
-            $this->page->get('a'),
-            'href',
-            'https://example.cypress.io/'
+            $this->page->get('.navbar img'),
+            'width',
+            '28'
         );
     }
     
@@ -227,16 +205,14 @@ class PuthDuskAssertionsTest extends PuthTestCase
     }
     
     public function testAssertEnabled() {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $this->assertEnabled($this->page->get('input'));
+        $this->assertEnabled($this->page->get('#actions-focus'));
     }
-    
-    public function testAssertDisabled() {
-        $this->page->goto('https://example.cypress.io/commands/actions');
-        
-        $this->assertDisabled($this->page->get('input[disabled]'));
-    }
+
+    // TODO add disable element to playground
+    // public function testAssertDisabled() {
+    //
+    //     $this->assertDisabled($this->page->get('input[disabled]'));
+    // }
     
     public function testAssertButtonEnabled() {
         // TODO write test
@@ -247,11 +223,23 @@ class PuthDuskAssertionsTest extends PuthTestCase
     }
     
     public function testAssertFocused() {
-        // TODO implement
+        $this->page->goto('https://playground.puth.dev');
+
+        $el = $this->page->get('#actions-focus');
+        $el->click();
+
+        $this->assertFocused($el);
     }
     
     public function testAssertNotFocused() {
-        // TODO implement
+        $this->page->goto('https://playground.puth.dev');
+
+        $el = $this->page->get('#actions-focus');
+        $el->click();
+
+        $this->page->get('#actions-type input')->click();
+
+        $this->assertNotFocused($el);
     }
     
     public function testAssertScript() {
