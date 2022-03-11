@@ -207,7 +207,7 @@ trait PuthTestCaseTrait
 
     public function getPuthInstanceUrl(): string
     {
-        return 'http://localhost:' . static::$puthPort;
+        return 'http://localhost:' . static::getPuthPort();
     }
 
     public function getBaseUrl(): ?string
