@@ -3,25 +3,19 @@
 namespace Puth\Traits;
 
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\ExpectationFailedException;
-use SebastianBergmann\Comparator\ComparisonFailure;
+use Puth\Assertions\Constraint\ElementEquals;
 
 trait PuthAssertions
 {
     function assertElementEquals($element1, $element2)
     {
-        $assertion = $this->context->assertStrictEqual($element1, $element2);
-        
-        if ($assertion->result === false) {
-            $expectedString = "Generic({$element1->getRepresents()}, {$element1->getId()})";
-            $actualString = "Generic({$element2->getRepresents()}, {$element2->getId()})";
-            
-            throw new ExpectationFailedException(
-                "Expected element [{$expectedString}] to be [{$actualString}]",
-                new ComparisonFailure($expectedString, $actualString, $expectedString, $actualString),
-            );
-        }
-        
-        Assert::assertEquals(1,1);
+        Assert::assertThat($element1, new ElementEquals($element2, $this->context));
+    }
+
+    function assertElementNotEquals($element1, $element2)
+    {
+        Assert::assertThat($element1, $this->logicalNot(
+            new ElementEquals($element2, $this->context)
+        ));
     }
 }
