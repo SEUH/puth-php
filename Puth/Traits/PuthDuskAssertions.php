@@ -45,74 +45,67 @@ trait PuthDuskAssertions
      * Assert that the given encrypted cookie is present.
      *
      * @param string $name
-     * @param bool $decrypt
      * @return $this
      */
-    public function assertHasCookie($name, $decrypt = true)
+    public function assertHasCookie($name)
     {
-        $cookie = $decrypt ? $this->cookie($name) : $this->plainCookie($name);
-        
         Assert::assertTrue(
-            !is_null($cookie),
+            !is_null($this->plainCookie($name)),
             "Did not find expected cookie [{$name}]."
         );
         
         return $this;
     }
     
-    /**
-     * Assert that the given unencrypted cookie is present.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function assertHasPlainCookie($name)
-    {
-        return $this->assertHasCookie($name, false);
-    }
+    // /**
+    //  * Assert that the given unencrypted cookie is present.
+    //  *
+    //  * @param string $name
+    //  * @return $this
+    //  */
+    // public function assertHasPlainCookie($name)
+    // {
+    //     return $this->assertHasCookie($name, false);
+    // }
     
     /**
      * Assert that the given encrypted cookie is not present.
      *
      * @param string $name
-     * @param bool $decrypt
      * @return $this
      */
-    public function assertCookieMissing($name, $decrypt = true)
+    public function assertCookieMissing($name)
     {
-        $cookie = $decrypt ? $this->cookie($name) : $this->plainCookie($name);
-        
         Assert::assertTrue(
-            is_null($cookie),
+            is_null($this->plainCookie($name)),
             "Found unexpected cookie [{$name}]."
         );
         
         return $this;
     }
     
-    /**
-     * Assert that the given unencrypted cookie is not present.
-     *
-     * @param string $name
-     * @return $this
-     */
-    public function assertPlainCookieMissing($name)
-    {
-        return $this->assertCookieMissing($name, false);
-    }
+    // /**
+    //  * Assert that the given unencrypted cookie is not present.
+    //  *
+    //  * @param string $name
+    //  * @return $this
+    //  */
+    // public function assertPlainCookieMissing($name)
+    // {
+    //     return $this->assertCookieMissing($name, false);
+    // }
     
     /**
      * Assert that an encrypted cookie has a given value.
      *
      * @param string $name
      * @param string $value
-     * @param bool $decrypt
      * @return $this
      */
-    public function assertCookieValue($name, $value, $decrypt = true)
+    public function assertCookieValue($name, $value)
     {
-        $actual = $decrypt ? $this->cookie($name) : $this->plainCookie($name);
-        
+        $actual = $this->plainCookie($name);
+
         Assert::assertEquals(
             $value, $actual,
             "Cookie [{$name}] had value [{$actual}], but expected [{$value}]."
@@ -121,17 +114,17 @@ trait PuthDuskAssertions
         return $this;
     }
     
-    /**
-     * Assert that an unencrypted cookie has a given value.
-     *
-     * @param string $name
-     * @param string $value
-     * @return $this
-     */
-    public function assertPlainCookieValue($name, $value)
-    {
-        return $this->assertCookieValue($name, $value, false);
-    }
+    // /**
+    //  * Assert that an unencrypted cookie has a given value.
+    //  *
+    //  * @param string $name
+    //  * @param string $value
+    //  * @return $this
+    //  */
+    // public function assertPlainCookieValue($name, $value)
+    // {
+    //     return $this->assertCookieValue($name, $value, false);
+    // }
     
     /**
      * Assert that the given text appears on the page.
