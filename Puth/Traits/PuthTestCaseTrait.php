@@ -6,6 +6,16 @@ use Puth\Context;
 use Puth\GenericObject;
 use Symfony\Component\Process\Process;
 
+/**
+ * PuthTestCaseTrait
+ *
+ * @property boolean $snapshot Enable snapshotting. You can use snapshots to view/review the test live in the GUI.
+ * @property boolean $dev Enable if you are locally writing tests.
+ * @property boolean $debug Enables debug output on client and server side
+ * @property boolean $headless Override headless browser setting.
+ * @property boolean $baseUrl Shorthand variable for navigation to a default url.
+ * @property array $cookies Array of cookies to be set on setUp().
+ */
 trait PuthTestCaseTrait
 {
     public Context $context;
@@ -14,6 +24,8 @@ trait PuthTestCaseTrait
 
     /**
      * The Puth process instance.
+     *
+     * https://symfony.com/doc/current/components/process.html
      *
      * @var Process
      */
@@ -24,42 +36,7 @@ trait PuthTestCaseTrait
      *
      * @var int
      */
-    public static int $puthPort;
-
-    /**
-     * Enable if you are locally writing tests.
-     *
-     * @var bool
-     */
-    public bool $dev = false;
-
-    /**
-     * Enables debug output on client and server side
-     *
-     * @var bool
-     */
-    public bool $debug = false;
-
-    /**
-     * Enable snapshotting. You can use snapshots to view/review the test live in the GUI.
-     *
-     * @var bool
-     */
-    public bool $snapshot = true;
-
-    /**
-     * Override headless browser setting.
-     *
-     * @var bool
-     */
-    public bool $headless;
-
-    /**
-     * Shorthand variable for navigation to a default url.
-     *
-     * @var string
-     */
-    // protected string $baseUrl;
+    protected static int $puthPort;
 
     /**
      * Set to connect to custom browser ws endpoint instead of the puth server creating a new one.
@@ -80,6 +57,21 @@ trait PuthTestCaseTrait
     ];
 
     /**
+     * Prepare for Puth test execution.
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+
+        if (!method_exists(__CLASS__, 'shouldCreatePuthProcess') || static::shouldCreatePuthProcess()) {
+            static::startPuthProcess();
+        }
+    }
+
+    /**
      * Sets up a Context, Browser and Page for every test.
      */
     protected function setUp(): void
@@ -87,7 +79,7 @@ trait PuthTestCaseTrait
         parent::setUp();
 
         $this->context = new Context($this->getPuthInstanceUrl(), [
-            'snapshot' => $this->shouldSnapshot(),
+            'snapshot' => $this->isSnapshot(),
             'test' => [
                 'name' => $this->getName(),
             ],
@@ -115,12 +107,8 @@ trait PuthTestCaseTrait
             ]);
         }
 
+        // Get the default page of the browser
         $this->page = $this->browser->pages()[0];
-
-        if ($this->isDev() && $this->defaultViewport) {
-            // Default viewport is only set if you create or connect to a browser.
-            $this->page->setViewport($this->defaultViewport);
-        }
 
         // Set prefers-reduced-motion to reduce because click has problems to wait for scroll
         // animation if 'scroll-behavior: smooth' is set.
@@ -131,26 +119,12 @@ trait PuthTestCaseTrait
         ]]);
 
         // Set default cookies if defined
-        if (property_exists($this, 'cookies')) {
+        if (isset($this->cookies)) {
             $this->page->setCookie(...$this->cookies);
         }
 
         if ($baseUrl = $this->getBaseUrl()) {
             $this->page->goto($baseUrl);
-        }
-    }
-
-    /**
-     * Prepare for Puth test execution.
-     *
-     * @beforeClass
-     * @return void
-     * @throws \Exception
-     */
-    public static function prepare()
-    {
-        if (!method_exists(__CLASS__, 'shouldCreatePuthProcess') || static::shouldCreatePuthProcess()) {
-            static::startPuthProcess();
         }
     }
 
@@ -170,7 +144,7 @@ trait PuthTestCaseTrait
         if ($this->hasFailed()) {
             $this->context->testFailed();
 
-            if ($this->saveSnapshotOnFailure) {
+            if ($this->shouldSaveSnapshotOnFailure()) {
                 $destroyOptions['save'] = ['to' => 'file'];
             }
         }
@@ -178,9 +152,9 @@ trait PuthTestCaseTrait
         $this->context->destroy(['options' => $destroyOptions]);
     }
 
-    protected function testDownClass()
+    public static function tearDownAfterClass(): void
     {
-        parent::testDownClass();
+        parent::tearDownAfterClass();
 
         if (isset(static::$puthProcess)) {
             static::$puthProcess->stop();
@@ -197,6 +171,13 @@ trait PuthTestCaseTrait
         static::$puthProcess->waitUntil(function ($type, $output) {
             return str_contains($output, '[Puth][Server] Api on');
         });
+
+        if (static::$puthProcess->isTerminated()) {
+            $error = static::$puthProcess->getErrorOutput();
+            $exitCode = static::$puthProcess->getExitCode();
+
+            throw new \RuntimeException("Puth could not be started. Command exited with code {$exitCode}: {$error}");
+        }
     }
 
     public static function getPuthPort()
@@ -215,47 +196,49 @@ trait PuthTestCaseTrait
 
     public function getBaseUrl(): ?string
     {
-        if (property_exists($this, 'baseUrl')) {
-            return $this->baseUrl;
-        }
-
-        return null;
+        return $this->baseUrl ?? null;
     }
 
-    protected function isDev(): bool
+    public function isSnapshot(): bool
     {
-        return isset($this->dev) ? $this->dev : false;
+        return $this->snapshot ?? true;
     }
 
-    protected function getTimeout(): bool
+    public function isDev(): bool
+    {
+        return $this->dev ?? false;
+    }
+
+    public function getTimeout(): bool
     {
         return $this->timeout ?? 10 * 1000;
     }
 
-    protected function isDebug(): bool
+    public function isDebug(): bool
     {
-        return isset($this->debug) ? $this->debug : false;
+        return $this->debug ?? false;
     }
 
-    protected function shouldSnapshot(): bool
-    {
-        return isset($this->snapshot) ? $this->snapshot : false;
-    }
-
-    protected function hasSpecificBrowserWSEndpoint(): bool
+    public function hasSpecificBrowserWSEndpoint(): bool
     {
         return !empty($this->browserWSEndpoint);
     }
 
-    protected function shouldStartInHeadlessMode(): bool
+    public function shouldStartInHeadlessMode(): bool
     {
         if (isset($this->headless)) {
             return $this->headless;
         }
+
         if ($this->isDev()) {
             return false;
         }
 
         return true;
+    }
+
+    public function shouldSaveSnapshotOnFailure()
+    {
+        return $this->saveSnapshotOnFailure ?? false;
     }
 }
