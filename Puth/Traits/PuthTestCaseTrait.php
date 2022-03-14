@@ -209,7 +209,7 @@ trait PuthTestCaseTrait
         return $this->dev ?? false;
     }
 
-    public function getTimeout(): bool
+    public function getTimeout(): int
     {
         return $this->timeout ?? 10 * 1000;
     }
