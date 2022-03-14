@@ -89,6 +89,8 @@ trait PerformsActionsTrait
             }, $body->value);
         } else if ($body->type === 'GenericValue') {
             return $body->value;
+        } else if ($body->type === 'GenericValues') {
+            return $body->value;
         } else if ($body->type === 'PuthAssertion') {
             return $body;
         } else {
