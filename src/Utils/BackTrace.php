@@ -27,10 +27,9 @@ class BackTrace
             }
 
             $message .= sprintf(
-                "#{$idx} %s:%s %s\n",
+                "#{$idx} %s:%s\n",
                 $frame['file'],
                 $frame['line'] ?? '?',
-                $frame['class']
             );
         }
 
