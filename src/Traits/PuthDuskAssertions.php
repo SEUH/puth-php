@@ -8,6 +8,7 @@ use Puth\GenericObject;
 trait PuthDuskAssertions
 {
     use PuthAssertions;
+    use PuthUtils;
 
     /**
      * Assert that the page title is the given value.

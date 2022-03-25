@@ -7,6 +7,8 @@ use PHPUnit\Framework\Constraint\RegularExpression;
 
 trait PuthDuskUrlAssertions
 {
+    use PuthUtils;
+
     /**
      * Assert that the current URL matches the given URL.
      *
@@ -170,12 +172,14 @@ trait PuthDuskUrlAssertions
     {
         $pattern = str_replace('\*', '.*', preg_quote($path, '/'));
         
-        $actualPath = parse_url($this->page->url(), PHP_URL_PATH) ?? '';
-        
-        Assert::assertThat(
-            $actualPath, new RegularExpression('/^' . $pattern . '$/u'),
-            "Actual path [{$actualPath}] does not equal expected path [{$path}]."
-        );
+        $this->retryFunc(function () use ($path, $pattern) {
+            $actualPath = parse_url($this->page->url(), PHP_URL_PATH) ?? '';
+
+            Assert::assertThat(
+                $actualPath, new RegularExpression('/^' . $pattern . '$/u'),
+                "Actual path [{$actualPath}] does not equal expected path [{$path}]."
+            );
+        });
         
         return $this;
     }

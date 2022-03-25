@@ -1,7 +1,8 @@
 <?php
 
-use Puth\PuthTestCase;
+namespace Tests\Feature;
 
+use Puth\PuthTestCase;
 
 class PuthQueryingTest extends PuthTestCase
 {
