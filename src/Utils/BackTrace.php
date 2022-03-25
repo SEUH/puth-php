@@ -11,7 +11,7 @@ class BackTrace
     public static function filter($trace): array
     {
         return array_values(array_filter($trace, function ($frame) {
-            return ! str_contains($frame['file'], 'puth-php/src');
+            return ! (str_contains($frame['file'], 'puth-php/src') || str_contains($frame['file'], 'puth/php/src'));
         }));
     }
 
