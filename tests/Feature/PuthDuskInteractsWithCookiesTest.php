@@ -1,9 +1,9 @@
 <?php
 
+namespace Tests\Feature;
+
 use Puth\PuthTestCase;
 use Puth\Traits\PuthDuskInteractsWithCookies;
-use Puth\ProductPage;
-
 
 class PuthDuskInteractsWithCookiesTest extends PuthTestCase
 {

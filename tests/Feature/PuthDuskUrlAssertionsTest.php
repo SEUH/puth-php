@@ -1,8 +1,9 @@
 <?php
 
+namespace Tests\Feature;
+
 use Puth\PuthTestCase;
 use Puth\Traits\PuthDuskUrlAssertions;
-
 
 class PuthDuskUrlAssertionsTest extends PuthTestCase
 {
