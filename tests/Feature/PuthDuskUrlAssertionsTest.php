@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use Puth\PuthTestCase;
 use Puth\Traits\PuthDuskUrlAssertions;
+use Tests\TestCase;
 
-class PuthDuskUrlAssertionsTest extends PuthTestCase
+class PuthDuskUrlAssertionsTest extends TestCase
 {
     use PuthDuskUrlAssertions;
     
-    protected string $baseUrl = 'https://playground.puth.dev/';
+    protected string $baseUrl = 'https://playground.puth.dev/?test=puth#fragment-puth';
     
     public function testAssertUrlIs()
     {
-        $this->assertUrlIs($this->baseUrl);
+        $this->assertUrlIs('https://playground.puth.dev/');
     }
     
     public function testAssertSchemeIs()
@@ -64,41 +64,36 @@ class PuthDuskUrlAssertionsTest extends PuthTestCase
 
     public function testAssertFragmentIs()
     {
-        $this->page->goto('https://example.cypress.io/commands/querying#test');
-        $this->assertFragmentIs('test');
+        $this->assertFragmentIs('fragment-puth');
     }
     
     public function testAssertFragmentBeginsWith()
     {
-        $this->page->goto('https://example.cypress.io/commands/querying#test-234');
-        $this->assertFragmentBeginsWith('test');
+        $this->assertFragmentBeginsWith('fragment');
     }
     
     public function testAssertFragmentIsNot()
     {
-        $this->page->goto('https://example.cypress.io/commands/querying#test-234');
-        $this->assertFragmentIsNot('test-not');
+        $this->assertFragmentIsNot('fragment-not');
     }
     
     // public function testAssertRouteIs()
     // {
     //     // TODO $this->assertRouteIs();
     // }
-    
+
     public function testAssertQueryStringHas()
     {
-        $this->page->goto('https://example.cypress.io/commands/querying?test=puth');
         $this->assertQueryStringHas('test', 'puth');
     }
     
     public function testAssertQueryStringMissing()
     {
-        $this->assertQueryStringMissing('test');
+        $this->assertQueryStringMissing('test-missing');
     }
     
     public function testAssertHasQueryStringParameter()
     {
-        $this->page->goto('https://example.cypress.io/commands/querying?test=puth');
         $this->assertHasQueryStringParameter('test');
     }
 }

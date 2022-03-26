@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Puth\PuthTestCase;
 use Puth\Traits\PuthDuskInteractsWithCookies;
+use Tests\TestCase;
 
-class PuthDuskInteractsWithCookiesTest extends PuthTestCase
+class PuthDuskInteractsWithCookiesTest extends TestCase
 {
     use PuthDuskInteractsWithCookies;
     

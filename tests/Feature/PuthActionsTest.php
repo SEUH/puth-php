@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Puth\PuthTestCase;
 use Puth\Traits\PuthAssertions;
+use Tests\TestCase;
 
-class PuthActionsTest extends PuthTestCase
+class PuthActionsTest extends TestCase
 {
     use PuthAssertions;
     
@@ -16,7 +16,7 @@ class PuthActionsTest extends PuthTestCase
         $input = $this->page->get('#actions-type input')->type('puth test verify');
         $this->assertEquals('puth test verify', $input->value());
     }
-    
+
     function testFocus()
     {
         $input = $this->page->get('#actions-focus')->focus();

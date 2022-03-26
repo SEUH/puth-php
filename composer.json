@@ -8,6 +8,10 @@
         "phpunit/phpunit": "^9.4",
         "symfony/process": "^4.3|^5.0"
     },
+    "scripts": {
+        "test": "paratest",
+        "test:local": "PUTH_REMOTE_URL=http://127.0.0.1:4000 phpunit"
+    },
     "autoload": {
         "psr-4": {
             "Puth\\": "src"

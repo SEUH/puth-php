@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use Puth\PuthTestCase;
+use Tests\TestCase;
 
-class PuthTraversalTest extends PuthTestCase
+class PuthTraversalTest extends TestCase
 {
     protected string $baseUrl = 'https://playground.puth.dev/';
     

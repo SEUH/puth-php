@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use Puth\PuthTestCase;
 use Puth\Traits\PuthDuskAssertions;
+use Tests\TestCase;
 
-class PuthDuskAssertionsTest extends PuthTestCase
+class PuthDuskAssertionsTest extends TestCase
 {
     use PuthDuskAssertions;
     

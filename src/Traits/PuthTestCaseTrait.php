@@ -2,9 +2,11 @@
 
 namespace Puth\Traits;
 
+use Exception;
 use Puth\Context;
 use Puth\GenericObject;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 /**
  * PuthTestCaseTrait
@@ -159,6 +161,36 @@ trait PuthTestCaseTrait
         if (isset(static::$puthProcess)) {
             static::$puthProcess->stop();
         }
+    }
+
+    public function onNotSuccessfulTest(Throwable $t): void
+    {
+        // Try to get file contents of originator
+        $files = [];
+
+        try {
+            $files[] = [
+                'path' => $t->getFile(),
+                'content' => file_get_contents($t->getFile()),
+            ];
+        } catch (Exception $e) {
+        }
+
+        $this->context->exception([
+            'origin' => 'default',
+            'lang' => 'php',
+            'runner' => 'phpunit',
+            'exception' => [
+                'message' => $t->getMessage(),
+                'code' => $t->getCode(),
+                'file' => $t->getFile(),
+                'line' => $t->getLine(),
+                'trace' => $t->getTrace(),
+                'files' => $files,
+            ],
+        ]);
+
+        parent::onNotSuccessfulTest($t);
     }
 
     public static function startPuthProcess()

@@ -31,7 +31,7 @@ trait PuthDuskUrlAssertions
         
         Assert::assertThat(
             $currentUrl, new RegularExpression('/^' . $pattern . '$/u'),
-            "Actual URL [{$this->page->url()}] does not equal expected URL [{$url}]."
+            "Actual URL [{$currentUrl}] does not equal expected URL [{$url}]."
         );
         
         return $this;
