@@ -5,6 +5,8 @@ namespace Puth\Traits;
 use Exception;
 use Puth\Context;
 use Puth\GenericObject;
+use Puth\Utils\BackTrace;
+use SplFileObject;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -163,17 +165,59 @@ trait PuthTestCaseTrait
         }
     }
 
+    private function readLinesFromFile($file, $line, $span)
+    {
+        $lines = [];
+
+        $spl = new SplFileObject($file);
+
+        $start = $line - floor($span / 2) - 1;
+        $start = $start < 0 ? 0 : $start;
+
+        $spl->seek($start);
+
+        for ($i = 0; $i < $span; $i++) {
+            $lines[] = $spl->current();
+
+            $spl->next();
+
+            if ($spl->eof()) {
+                break;
+            }
+        }
+
+        return [
+            'offset' => $start,
+            'lines' => $lines,
+        ];
+    }
+
     public function onNotSuccessfulTest(Throwable $t): void
     {
         // Try to get file contents of originator
         $files = [];
 
+        $trace = array_merge([[
+            'file' => $t->getFile(),
+            'line' => $t->getLine(),
+        ]], $t->getTrace());
+
+        $trace = BackTrace::filter($trace);
+        $originator = array_shift($trace);
+
         try {
+            $content = $this->readLinesFromFile($originator['file'], $originator['line'], 9);
+
             $files[] = [
-                'path' => $t->getFile(),
-                'content' => file_get_contents($t->getFile()),
+                'path' => $originator['file'],
+                'content' => implode($content['lines']),
+                'offset' => $content['offset'],
             ];
         } catch (Exception $e) {
+        }
+
+        if (method_exists($this, 'puthCollectFilesOnFailure')) {
+            $files = array_merge($files, $this->puthCollectFilesOnFailure());
         }
 
         $this->context->exception([
@@ -183,9 +227,9 @@ trait PuthTestCaseTrait
             'exception' => [
                 'message' => $t->getMessage(),
                 'code' => $t->getCode(),
-                'file' => $t->getFile(),
-                'line' => $t->getLine(),
-                'trace' => $t->getTrace(),
+                'file' => $originator['file'],
+                'line' => $originator['line'],
+                'trace' => $trace,
                 'files' => $files,
             ],
         ]);
