@@ -3,12 +3,14 @@
 namespace Puth;
 
 use GuzzleHttp\Client;
+use Puth\Objects\Browser;
 use Puth\Traits\ActionTranslationTrait;
 use Puth\Traits\PerformsActionsTrait;
 
 
 /**
- * @method connectBrowser(string[] $array)
+ * @method Browser connectBrowser(string[] $array)
+ * @method Browser createBrowser(string[] $array)
  */
 class Context
 {

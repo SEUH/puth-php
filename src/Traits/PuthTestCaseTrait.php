@@ -3,7 +3,8 @@
 namespace Puth\Traits;
 
 use Puth\Context;
-use Puth\GenericObject;
+use Puth\Objects\Browser;
+use Puth\Objects\Page;
 use Symfony\Component\Process\Process;
 
 /**
@@ -19,8 +20,8 @@ use Symfony\Component\Process\Process;
 trait PuthTestCaseTrait
 {
     public Context $context;
-    public GenericObject $browser;
-    public GenericObject $page;
+    public Browser $browser;
+    public Page $page;
 
     /**
      * The Puth process instance.

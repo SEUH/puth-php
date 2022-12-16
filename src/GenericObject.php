@@ -19,6 +19,9 @@ class GenericObject
     private $actionTranslations = [
         'get' => '$',
         'getAll' => '$$',
+        'getAllEval' => '$$eval',
+        'getEval' => '$eval',
+        'getX' => '$x',
     ];
 
     function __construct($id, $type, $represents, $parent)
